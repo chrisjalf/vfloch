@@ -1,4 +1,4 @@
-:root {
+/* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -76,4 +76,35 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+} */
+
+/* import the required styles */
+@import "@vue-flow/core/dist/style.css";
+
+/* import the default theme (optional) */
+@import "@vue-flow/core/dist/theme-default.css";
+
+@import "@vue-flow/controls/dist/style.css";
+@import "@vue-flow/minimap/dist/style.css";
+
+body {
+  color: #111;
+  padding: 5px;
+}
+
+#app {
+  /* text-transform: uppercase; */
+  font-weight: 600;
+  font-family: "JetBrains Mono", monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  height: 100%;
 }

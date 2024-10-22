@@ -1,43 +1,56 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, nextTick } from "vue";
+import { Background } from "@vue-flow/background";
+import { Controls } from "@vue-flow/controls";
+import { MiniMap } from "@vue-flow/minimap";
+import { VueFlow } from "@vue-flow/core";
 
-defineProps({
-  msg: String,
-})
+import payload from "../data/payload";
 
-const count = ref(0)
+import { useLayout } from "../utils/useLayout";
+const { layout } = useLayout();
+
+const nodes = ref(
+  payload.map((p) => {
+    return {
+      id: `${p.id}`,
+      label: p.name ?? 'N/A',
+      position: { x: 0, y: 0 },
+      deletable: false,
+    };
+  })
+);
+const edges = ref(
+  payload.map((p) => {
+    if (p.parentId) {
+      return {
+        id: `${p.id}_${p.parentId}`,
+        source: `${p.parentId}`,
+        target: `${p.id}`,
+        type: "smoothstep",
+      };
+    }
+  })
+);
+
+nextTick(() => {
+  nodes.value = layout(nodes.value, edges.value, "TB");
+});
 </script>
 
 <template>
-  <h1>{{ msg }}</h1>
+  <div style="height: 100vh">
+    <VueFlow
+      v-model:nodes="nodes"
+      v-model:edges="edges"
+      fit-view-on-init
+      class="vue-flow-basic-example"
+    >
+      <Background pattern-color="#aaa" :gap="8" />
 
-  <div class="card">
-    <button type="button" @click="count++">count is {{ count }}</button>
-    <p>
-      Edit
-      <code>components/HelloWorld.vue</code> to test HMR
-    </p>
+      <MiniMap />
+
+      <Controls />
+    </VueFlow>
   </div>
-
-  <p>
-    Check out
-    <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank"
-      >create-vue</a
-    >, the official Vue + Vite starter
-  </p>
-  <p>
-    Learn more about IDE Support for Vue in the
-    <a
-      href="https://vuejs.org/guide/scaling-up/tooling.html#ide-support"
-      target="_blank"
-      >Vue Docs Scaling up Guide</a
-    >.
-  </p>
-  <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
 </template>
-
-<style scoped>
-.read-the-docs {
-  color: #888;
-}
-</style>
