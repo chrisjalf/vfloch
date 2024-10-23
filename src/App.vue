@@ -1,23 +1,22 @@
-<script setup>
-import HelloWorld from "./components/HelloWorld.vue";
-</script>
-
 <template>
   <div></div>
   <HelloWorld />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+<script setup>
+import HelloWorld from "./components/HelloWorld.vue";
+</script>
+
+<style>
+@import "bootstrap/dist/css/bootstrap.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+/* import the required styles */
+@import "@vue-flow/core/dist/style.css";
+
+/* import the default theme (optional) */
+@import "@vue-flow/core/dist/theme-default.css";
+
+@import "@vue-flow/controls/dist/style.css";
+@import "@vue-flow/minimap/dist/style.css";
 </style>
