@@ -1,13 +1,13 @@
 <template>
-  <div></div>
-  <HelloWorld />
+  <TheHeader />
+  <router-view></router-view>
 </template>
 
 <script setup>
-import HelloWorld from "./components/HelloWorld.vue";
+import TheHeader from "./layout/TheHeader.vue";
 </script>
 
-<style>
+<style lang="scss">
 @import "bootstrap/dist/css/bootstrap.css";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 

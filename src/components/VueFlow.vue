@@ -1,39 +1,37 @@
 <template>
-  <div style="height: 100vh">
-    <VueFlow
-      :nodes="nodes"
-      :edges="edges"
-      ref="vueFlowRef"
-      fit-view-on-init
-      class="vue-flow-basic-example"
-    >
-      <template #node-trigger="triggerNodeProps">
-        <TriggerNode v-bind="triggerNodeProps" />
-      </template>
+  <VueFlow
+    :nodes="nodes"
+    :edges="edges"
+    ref="vueFlowRef"
+    fit-view-on-init
+    class="vue-flow"
+  >
+    <template #node-trigger="triggerNodeProps">
+      <TriggerNode v-bind="triggerNodeProps" />
+    </template>
 
-      <template #node-dateTime="dateTimeNodeProps">
-        <BusinessHoursNode v-bind="dateTimeNodeProps" />
-      </template>
+    <template #node-dateTime="dateTimeNodeProps">
+      <BusinessHoursNode v-bind="dateTimeNodeProps" />
+    </template>
 
-      <template #node-dateTimeConnector="dateTimeConnectorNodeProps">
-        <DateTimeConnectorNode v-bind="dateTimeConnectorNodeProps" />
-      </template>
+    <template #node-dateTimeConnector="dateTimeConnectorNodeProps">
+      <DateTimeConnectorNode v-bind="dateTimeConnectorNodeProps" />
+    </template>
 
-      <template #node-sendMessage="sendMessageNodeProps">
-        <SendMessageNode v-bind="sendMessageNodeProps" />
-      </template>
+    <template #node-sendMessage="sendMessageNodeProps">
+      <SendMessageNode v-bind="sendMessageNodeProps" />
+    </template>
 
-      <template #node-addComment="addCommentNodeProps">
-        <AddCommentNode v-bind="addCommentNodeProps" />
-      </template>
+    <template #node-addComment="addCommentNodeProps">
+      <AddCommentNode v-bind="addCommentNodeProps" />
+    </template>
 
-      <Background pattern-color="#aaa" :gap="8" />
+    <Background pattern-color="#aaa" :gap="8" />
 
-      <MiniMap />
+    <MiniMap />
 
-      <Controls />
-    </VueFlow>
-  </div>
+    <Controls />
+  </VueFlow>
 </template>
 
 <script setup>
@@ -117,3 +115,9 @@ onMounted(async () => {
   nodes.value = layout(nodesWithDimension, edges.value, "TB");
 });
 </script>
+
+<style lang="scss" scoped>
+.vue-flow {
+  height: calc(100vh - 110px);
+}
+</style>
