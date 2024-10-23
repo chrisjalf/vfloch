@@ -32,6 +32,8 @@
 
     <Controls />
   </VueFlow>
+
+  <button @click="addNode()"></button>
 </template>
 
 <script setup>
@@ -48,6 +50,7 @@ import SendMessageNode from "./SendMessageNode.vue";
 import AddCommentNode from "./AddCommentNode.vue";
 
 import { useLayout } from "../utils/useLayout";
+
 import payload from "../data/payload";
 
 const { layout } = useLayout();
@@ -109,6 +112,39 @@ async function measureNodeDimensions() {
 
   return nodeWithDimensions;
 }
+
+/* OBSERVING */
+function deleteNode(id) {
+  deleteEdges(id);
+  nodes.value = nodes.value.filter((node) => node.id !== id);
+}
+
+function deleteEdges(nodeId) {
+  edges.value = edges.value.filter(
+    (edge) => edge.source != nodeId && edge.target != nodeId
+  );
+}
+
+function addNode() {
+  const node = {
+    id: `${Math.random()}`,
+    type: "sendMessage",
+    label: "Placeholder title",
+    data: {
+      payload: [
+        {
+          type: "text",
+          text: "Placeholder text",
+        },
+      ],
+    },
+    position: { x: 0, y: 0 },
+    deletable: false,
+  };
+
+  nodes.value = [...nodes.value, node];
+}
+/* END OBSERVING */
 
 onMounted(async () => {
   const nodesWithDimension = await measureNodeDimensions();
