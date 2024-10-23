@@ -3,6 +3,7 @@
     <VueFlow
       :nodes="nodes"
       :edges="edges"
+      ref="vueFlowRef"
       fit-view-on-init
       class="vue-flow-basic-example"
     >
@@ -36,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, nextTick, onMounted } from "vue";
 import { Background } from "@vue-flow/background";
 import { Controls } from "@vue-flow/controls";
 import { MiniMap } from "@vue-flow/minimap";
@@ -78,9 +79,41 @@ const edges = ref(
   })
 );
 
-onMounted(() => {
-  nodes.value = layout(nodes.value, edges.value, "TB");
+const vueFlowRef = ref(null);
+
+// to measure node dimensions dynamically after rendering
+async function measureNodeDimensions() {
+  await nextTick(); // ensure DOM is fully updated
+
+  const nodeWithDimensions = nodes.value.map((node) => {
+    const element = vueFlowRef.value.$el.querySelector(
+      `[data-id="${node.id}"]`
+    );
+
+    // element found
+    if (element) {
+      // get width and height
+      const style = window.getComputedStyle(element);
+      const width = parseFloat(style.width);
+      const height = parseFloat(style.height);
+
+      return {
+        ...node,
+        dimensions: {
+          width,
+          height,
+        },
+      };
+    } else {
+      return node;
+    }
+  });
+
+  return nodeWithDimensions;
+}
+
+onMounted(async () => {
+  const nodesWithDimension = await measureNodeDimensions();
+  nodes.value = layout(nodesWithDimension, edges.value, "TB");
 });
 </script>
-
-<style></style>
