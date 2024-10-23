@@ -6,12 +6,20 @@
       fit-view-on-init
       class="vue-flow-basic-example"
     >
-      <template #node-sendMessage="sendMessageNodeProps">
-        <SendMessageNode v-bind="sendMessageNodeProps" />
+      <template #node-trigger="triggerNodeProps">
+        <TriggerNode v-bind="triggerNodeProps" />
+      </template>
+
+      <template #node-dateTime="dateTimeNodeProps">
+        <BusinessHoursNode v-bind="dateTimeNodeProps" />
       </template>
 
       <template #node-dateTimeConnector="dateTimeConnectorNodeProps">
         <DateTimeConnectorNode v-bind="dateTimeConnectorNodeProps" />
+      </template>
+
+      <template #node-sendMessage="sendMessageNodeProps">
+        <SendMessageNode v-bind="sendMessageNodeProps" />
       </template>
 
       <template #node-addComment="addCommentNodeProps">
@@ -34,9 +42,11 @@ import { Controls } from "@vue-flow/controls";
 import { MiniMap } from "@vue-flow/minimap";
 import { VueFlow } from "@vue-flow/core";
 
+import TriggerNode from "./TriggerNode.vue";
+import BusinessHoursNode from "./BusinessHoursNode.vue";
+import DateTimeConnectorNode from "./DateTimeConnectorNode.vue";
 import SendMessageNode from "./SendMessageNode.vue";
 import AddCommentNode from "./AddCommentNode.vue";
-import DateTimeConnectorNode from "./DateTimeConnectorNode.vue";
 
 import { useLayout } from "../utils/useLayout";
 import payload from "../data/payload";
