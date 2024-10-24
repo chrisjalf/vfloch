@@ -84,6 +84,7 @@
               type="button"
               className="btn btn-primary"
               data-bs-dismiss="modal"
+              @click="submitForm"
             >
               Create
             </button>
@@ -105,6 +106,8 @@
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import { Modal, Dropdown } from "bootstrap";
 
+import { useVueFlowStore } from "../stores/VueFlowStore";
+
 const nodeTypes = [
   {
     name: "Send Message",
@@ -119,6 +122,7 @@ const nodeTypes = [
     val: "businessHours",
   },
 ];
+
 const createNodeModal = ref();
 let createNodeModalObj;
 
@@ -131,6 +135,8 @@ const nodeTitle = ref("");
 const nodeDescription = ref("");
 const selectedNode = ref();
 const formError = ref({});
+
+const vueFlowStore = useVueFlowStore();
 
 function changeSelectedNode(node) {
   selectedNode.value = node;
@@ -162,6 +168,16 @@ function validateInput(fieldName) {
   } else formError.value[fieldName] = errorMessage;
 }
 
+function checkFields() {
+  formError.value = {};
+
+  if (nodeTitle.value.trim() === "")
+    formError.value["title"] = "Title is required";
+
+  if (selectedNode.value === undefined)
+    formError.value["nodeType"] = "Node type is required";
+}
+
 function toggleDropdown() {
   showDropdownMenu.value = !showDropdownMenu.value;
 
@@ -187,6 +203,48 @@ function resetForm() {
   nodeDescription.value = "";
   selectedNode.value = undefined;
   formError.value = {};
+}
+
+function submitForm() {
+  checkFields();
+
+  if (Object.keys(formError.value).length === 0) {
+    const node = {
+      id: `${Math.random()}`,
+      type: selectedNode.value.val,
+      label: nodeTitle.value,
+      data: {},
+      position: { x: 0, y: 0 },
+      deletable: false,
+    };
+
+    switch (selectedNode.value.val) {
+      case "businessHours":
+        node.type = "dateTime";
+        node.data.times = [];
+
+        if (nodeDescription.value !== "") {
+          node.data.payload = [{ type: "text", text: nodeDescription.value }];
+        }
+
+        break;
+      case "sendMessage":
+        if (nodeDescription.value !== "") {
+          node.data.payload = [{ type: "text", text: nodeDescription.value }];
+        }
+
+        break;
+      case "addComment":
+        if (nodeDescription.value !== "")
+          node.data.comment = nodeDescription.value;
+
+        break;
+      default:
+        break;
+    }
+
+    vueFlowStore.createNode(node);
+  }
 }
 
 function showModal() {
