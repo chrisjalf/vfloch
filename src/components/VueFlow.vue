@@ -42,6 +42,7 @@ import { Background } from "@vue-flow/background";
 import { Controls } from "@vue-flow/controls";
 import { MiniMap } from "@vue-flow/minimap";
 import { VueFlow, useVueFlow } from "@vue-flow/core";
+import { storeToRefs } from "pinia";
 
 import TriggerNode from "./TriggerNode.vue";
 import BusinessHoursNode from "./BusinessHoursNode.vue";
@@ -51,37 +52,12 @@ import AddCommentNode from "./AddCommentNode.vue";
 import CreateNodeModal from "./CreateNodeModal.vue";
 
 import { useLayout } from "../utils/useLayout";
-
-import payload from "../data/payload";
+import { useVueFlowStore } from "../stores/VueFlowStore";
 
 const { onNodeDragStop } = useVueFlow();
-
 const { layout } = useLayout();
-
-const nodes = ref(
-  payload.map((p) => {
-    return {
-      id: `${p.id}`,
-      type: p.type,
-      label: p.name ?? "N/A",
-      data: p.data,
-      position: { x: 0, y: 0 },
-      deletable: false,
-    };
-  })
-);
-const edges = ref(
-  payload.map((p) => {
-    if (p.parentId) {
-      return {
-        id: `${p.id}_${p.parentId}`,
-        source: `${p.parentId}`,
-        target: `${p.id}`,
-        type: "smoothstep",
-      };
-    }
-  })
-);
+const vueFlowStore = useVueFlowStore();
+const { nodes, edges } = storeToRefs(vueFlowStore);
 const vueFlowRef = ref(null);
 const createNodeModal = ref();
 
@@ -165,7 +141,9 @@ function openCreateNodeModal() {
 
 onMounted(async () => {
   const nodesWithDimension = await measureNodeDimensions();
-  nodes.value = layout(nodesWithDimension, edges.value, "TB");
+  vueFlowStore.updateNodesDimension(
+    layout(nodesWithDimension, edges.value, "TB")
+  );
 });
 </script>
 
