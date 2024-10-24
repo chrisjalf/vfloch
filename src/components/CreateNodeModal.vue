@@ -23,7 +23,17 @@
           <div className="modal-body">
             <div class="mb-3">
               <label class="form-label">Title</label>
-              <input type="text" class="form-control" v-model="nodeTitle" />
+              <input
+                type="text"
+                class="form-control"
+                :class="{ 'is-invalid': formError.title }"
+                @focus="validateInput('title')"
+                @input="validateInput('title')"
+                v-model="nodeTitle"
+              />
+              <div className="invalid-feedback" v-if="formError.title">
+                {{ formError.title }}
+              </div>
             </div>
             <div class="mb-3">
               <label class="form-label">Description</label>
@@ -37,22 +47,35 @@
               <div class="dropdown">
                 <button
                   class="btn dropdown-toggle"
+                  :class="{
+                    'is-invalid': formError.nodeType,
+                    show: showDropdownMenu,
+                  }"
                   type="button"
-                  data-bs-toggle="dropdown"
                   aria-expanded="false"
+                  ref="dropdownButton"
+                  @click="toggleDropdown"
                 >
                   {{ selectedNode ? selectedNode.name : "Select node type" }}
                 </button>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" ref="dropdownMenu">
                   <li v-for="(node, index) in nodeTypes" :key="index">
                     <a
                       class="dropdown-item"
+                      :class="{
+                        active: selectedNode
+                          ? selectedNode.val === node.val
+                          : false,
+                      }"
                       @click.prevent="changeSelectedNode(node)"
                     >
                       {{ node.name }}
                     </a>
                   </li>
                 </ul>
+              </div>
+              <div className="invalid-feedback" v-if="formError.nodeType">
+                {{ formError.nodeType }}
               </div>
             </div>
           </div>
@@ -79,11 +102,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { Modal } from "bootstrap";
-
-const createNodeModal = ref();
-let createNodeModalObj;
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import { Modal, Dropdown } from "bootstrap";
 
 const nodeTypes = [
   {
@@ -99,19 +119,74 @@ const nodeTypes = [
     val: "businessHours",
   },
 ];
+const createNodeModal = ref();
+let createNodeModalObj;
 
-const nodeTitle = ref();
-const nodeDescription = ref();
+const dropdownButton = ref();
+const dropdownMenu = ref();
+let dropdownObj;
+const showDropdownMenu = ref(false);
+
+const nodeTitle = ref("");
+const nodeDescription = ref("");
 const selectedNode = ref();
+const formError = ref({});
 
 function changeSelectedNode(node) {
   selectedNode.value = node;
+  showDropdownMenu.value = false;
+  dropdownObj.hide();
+
+  validateInput("nodeType");
 }
 
-function modalHidden() {
-  nodeTitle.value = null;
-  nodeDescription.value = null;
-  selectedNode.value = null;
+function validateInput(fieldName) {
+  let errorMessage = undefined;
+
+  switch (fieldName) {
+    case "title":
+      if (nodeTitle.value.trim() === "") errorMessage = "Title is required";
+
+      break;
+    case "nodeType":
+      if (selectedNode.value === undefined)
+        errorMessage = "Node type is required";
+
+      break;
+    default:
+      break;
+  }
+
+  if (errorMessage === undefined) {
+    delete formError.value[fieldName];
+  } else formError.value[fieldName] = errorMessage;
+}
+
+function toggleDropdown() {
+  showDropdownMenu.value = !showDropdownMenu.value;
+
+  validateInput("nodeType");
+
+  if (showDropdownMenu.value === true) dropdownObj.show();
+  else dropdownObj.hide();
+}
+
+function handleClickOutsideForDropdown(event) {
+  if (
+    dropdownMenu.value &&
+    !dropdownMenu.value.contains(event.target) &&
+    !dropdownButton.value.contains(event.target)
+  ) {
+    showDropdownMenu.value = false;
+    dropdownObj.hide();
+  }
+}
+
+function resetForm() {
+  nodeTitle.value = "";
+  nodeDescription.value = "";
+  selectedNode.value = undefined;
+  formError.value = {};
 }
 
 function showModal() {
@@ -123,15 +198,38 @@ defineExpose({ showModal });
 onMounted(() => {
   if (createNodeModal.value) {
     createNodeModalObj = new Modal(createNodeModal.value);
-    createNodeModal.value.addEventListener("hidden.bs.modal", modalHidden);
+    createNodeModal.value.addEventListener("hidden.bs.modal", resetForm);
   }
+
+  if (dropdownButton.value) {
+    dropdownObj = new Dropdown(dropdownButton.value);
+    document.addEventListener("mousedown", handleClickOutsideForDropdown);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (createNodeModal.value) {
+    createNodeModal.value.removeEventListener("hidden.bs.modal", resetForm);
+  }
+
+  document.removeEventListener("mousedown", handleClickOutsideForDropdown);
 });
 </script>
 
 <style lang="scss" scoped>
+.dropdown {
+  &:has(.is-invalid) + .invalid-feedback {
+    display: block;
+  }
+}
+
 .dropdown-toggle {
   color: var(--bs-btn-active-color);
   background-color: var(--bs-btn-active-bg);
   border-color: var(--bs-btn-active-border-color);
+
+  &.is-invalid {
+    border-color: var(--bs-form-invalid-border-color);
+  }
 }
 </style>
