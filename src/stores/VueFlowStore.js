@@ -2,10 +2,11 @@ import { defineStore } from "pinia";
 
 import payload from "../data/payload";
 
+const data = payload;
 export const useVueFlowStore = defineStore("vueFlowStore", {
   state: () => ({
-    data: payload,
-    nodes: payload.map((p) => {
+    data: data,
+    nodes: data.map((p) => {
       return {
         id: `${p.id}`,
         type: p.type,
@@ -15,7 +16,7 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
         deletable: false,
       };
     }),
-    edges: payload.map((p) => {
+    edges: data.map((p) => {
       if (p.parentId) {
         return {
           id: `${p.id}_${p.parentId}`,
@@ -32,6 +33,9 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
     },
     updateNodes(nodes) {
       this.nodes = nodes;
+    },
+    deleteNode(id) {
+      this.nodes.filter((node) => node.id !== id);
     },
   },
 });
