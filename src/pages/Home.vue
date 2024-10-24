@@ -1,7 +1,9 @@
 <template>
   <div class="container my-3">
     <div class="row">
-      <VueFlow />
+      <div class="col-lg-12">
+        <VueFlow />
+      </div>
     </div>
   </div>
 </template>

@@ -32,8 +32,8 @@
 
     <Controls />
   </VueFlow>
-
-  <button @click="addNode()"></button>
+  <button @click="openCreateNodeModal">Create Node?</button>
+  <CreateNodeModal ref="createNodeModal" />
 </template>
 
 <script setup>
@@ -41,17 +41,20 @@ import { ref, nextTick, onMounted } from "vue";
 import { Background } from "@vue-flow/background";
 import { Controls } from "@vue-flow/controls";
 import { MiniMap } from "@vue-flow/minimap";
-import { VueFlow } from "@vue-flow/core";
+import { VueFlow, useVueFlow } from "@vue-flow/core";
 
 import TriggerNode from "./TriggerNode.vue";
 import BusinessHoursNode from "./BusinessHoursNode.vue";
 import DateTimeConnectorNode from "./DateTimeConnectorNode.vue";
 import SendMessageNode from "./SendMessageNode.vue";
 import AddCommentNode from "./AddCommentNode.vue";
+import CreateNodeModal from "./CreateNodeModal.vue";
 
 import { useLayout } from "../utils/useLayout";
 
 import payload from "../data/payload";
+
+const { onNodeDragStop } = useVueFlow();
 
 const { layout } = useLayout();
 
@@ -79,8 +82,8 @@ const edges = ref(
     }
   })
 );
-
 const vueFlowRef = ref(null);
+const createNodeModal = ref();
 
 // to measure node dimensions dynamically after rendering
 async function measureNodeDimensions() {
@@ -143,6 +146,20 @@ function addNode() {
   };
 
   nodes.value = [...nodes.value, node];
+}
+
+onNodeDragStop((event) => {
+  // update node state to set new position after dragging stops
+  const nodeId = event.node.id;
+  const idx = nodes.value.findIndex((n) => n.id === nodeId);
+
+  if (idx > -1) {
+    nodes.value[idx].position = event.node.position;
+  }
+});
+
+function openCreateNodeModal() {
+  createNodeModal.value?.showModal();
 }
 /* END OBSERVING */
 
