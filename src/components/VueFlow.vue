@@ -141,9 +141,7 @@ function openCreateNodeModal() {
 
 onMounted(async () => {
   const nodesWithDimension = await measureNodeDimensions();
-  vueFlowStore.updateNodesDimension(
-    layout(nodesWithDimension, edges.value, "TB")
-  );
+  vueFlowStore.updateNodes(layout(nodesWithDimension, edges.value, "TB"));
 });
 </script>
 

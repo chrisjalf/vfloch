@@ -27,7 +27,10 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
     }),
   }),
   actions: {
-    updateNodesDimension(nodes) {
+    createNode(newNode) {
+      this.nodes.push(newNode);
+    },
+    updateNodes(nodes) {
       this.nodes = nodes;
     },
   },
