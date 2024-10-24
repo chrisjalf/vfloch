@@ -4,7 +4,7 @@
     :edges="edges"
     ref="vueFlowRef"
     fit-view-on-init
-    class="vue-flow"
+    class="vue-flow border border-dark-subtle rounded"
   >
     <template #node-trigger="triggerNodeProps">
       <TriggerNode v-bind="triggerNodeProps" />

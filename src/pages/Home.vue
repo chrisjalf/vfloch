@@ -1,7 +1,7 @@
 <template>
   <div class="container my-3">
     <div class="row">
-      <VueFlow class="border border-dark-subtle rounded" />
+      <VueFlow />
     </div>
   </div>
 </template>
