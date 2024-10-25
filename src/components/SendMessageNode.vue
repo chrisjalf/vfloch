@@ -19,7 +19,7 @@ const { data } = defineProps(["id", "label", "data"]);
 const textPayload = data.payload.find((p) => p.type === "text");
 const attachmentPayload = data.payload.find((p) => p.type === "attachment");
 
-let text = textPayload.text ?? "-";
+let text = textPayload?.text ?? "-";
 if (text.length > 50) text = text.slice(0, 50) + "...";
 </script>
 

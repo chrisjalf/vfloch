@@ -30,12 +30,38 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
   actions: {
     createNode(newNode) {
       this.nodes.push(newNode);
+
+      const newData = {
+        name: newNode.label,
+        id: newNode.id,
+        type: newNode.type,
+        data: newNode.data,
+      };
+      this.data.push(newData);
+
+      /* const nodeType = newNode.type;
+      switch (nodeType) {
+        case "sendMessage":
+          break;
+        case "dateTime":
+          break;
+        case "addComment":
+          break;
+        default:
+          break;
+      } */
     },
     updateNodes(nodes) {
       this.nodes = nodes;
     },
     deleteNode(id) {
-      this.nodes.filter((node) => node.id !== id);
+      deleteEdges(id);
+      this.nodes = this.nodes.filter((node) => node.id !== id);
+    },
+    deleteEdges(nodeId) {
+      this.edges = this.edges.filter(
+        (edge) => edge.source != nodeId && edge.target != nodeId
+      );
     },
   },
 });
