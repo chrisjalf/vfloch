@@ -39,8 +39,14 @@
               <label class="form-label">Description</label>
               <textarea
                 class="form-control"
+                :class="{ 'is-invalid': formError.description }"
+                @focus="validateInput('description')"
+                @input="validateInput('description')"
                 v-model="nodeDescription"
               ></textarea>
+              <div className="invalid-feedback" v-if="formError.description">
+                {{ formError.description }}
+              </div>
             </div>
             <div class="mb-3">
               <label class="form-label">Type</label>
@@ -83,7 +89,6 @@
             <button
               type="button"
               className="btn btn-primary"
-              data-bs-dismiss="modal"
               @click="submitForm"
             >
               Create
@@ -154,6 +159,11 @@ function validateInput(fieldName) {
       if (nodeTitle.value.trim() === "") errorMessage = "Title is required";
 
       break;
+    case "description":
+      if (nodeDescription.value.trim() === "")
+        errorMessage = "Description is required";
+
+      break;
     case "nodeType":
       if (selectedNode.value === undefined)
         errorMessage = "Node type is required";
@@ -173,6 +183,9 @@ function checkFields() {
 
   if (nodeTitle.value.trim() === "")
     formError.value["title"] = "Title is required";
+
+  if (nodeDescription.value.trim() === "")
+    formError.value["description"] = "Description is required";
 
   if (selectedNode.value === undefined)
     formError.value["nodeType"] = "Node type is required";
@@ -210,10 +223,11 @@ function submitForm() {
 
   if (Object.keys(formError.value).length === 0) {
     const node = {
-      id: `${Math.random()}`,
       type: selectedNode.value.val,
       label: nodeTitle.value,
-      data: {},
+      data: {
+        description: nodeTitle.description,
+      },
       position: { x: 0, y: 0 },
       deletable: false,
     };
@@ -222,33 +236,32 @@ function submitForm() {
       case "businessHours":
         node.type = "dateTime";
         node.data.times = [];
-
-        if (nodeDescription.value !== "") {
-          node.data.payload = [{ type: "text", text: nodeDescription.value }];
-        }
+        node.data.connectors = [];
+        node.data.timezone = "UTC";
+        node.data.action = selectedNode.value.val;
 
         break;
       case "sendMessage":
-        if (nodeDescription.value !== "") {
-          node.data.payload = [{ type: "text", text: nodeDescription.value }];
-        }
+        node.data.payload = [];
 
         break;
       case "addComment":
-        if (nodeDescription.value !== "")
-          node.data.comment = nodeDescription.value;
-
         break;
       default:
         break;
     }
 
     vueFlowStore.createNode(node);
+    hideModal();
   }
 }
 
 function showModal() {
   createNodeModalObj.show();
+}
+
+function hideModal() {
+  createNodeModalObj.hide();
 }
 
 defineExpose({ showModal });

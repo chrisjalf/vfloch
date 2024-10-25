@@ -7,13 +7,19 @@
     <div class="card-body">
       <p class="card-text">{{ description }}</p>
     </div>
+
+    <Handle type="source" :position="Position.Bottom" />
   </div>
 </template>
 
 <script setup>
+import { computed } from "vue";
+import { Handle, Position } from "@vue-flow/core";
+
 const { data } = defineProps(["id", "data"]);
-const description =
-  data.type === "conversationOpened" ? "Conversation Opened" : "N/A";
+const description = computed(() => {
+  return data.type === "conversationOpened" ? "Conversation Opened" : "N/A";
+});
 </script>
 
 <style scoped>

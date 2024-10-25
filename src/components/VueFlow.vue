@@ -32,8 +32,8 @@
 
     <Controls />
   </VueFlow>
-  <button @click="openCreateNodeModal">Create Node?</button>
-  <CreateNodeModal ref="createNodeModal" />
+
+  <NodeDrawer ref="nodeDrawerRef" />
 </template>
 
 <script setup>
@@ -49,17 +49,19 @@ import BusinessHoursNode from "./BusinessHoursNode.vue";
 import DateTimeConnectorNode from "./DateTimeConnectorNode.vue";
 import SendMessageNode from "./SendMessageNode.vue";
 import AddCommentNode from "./AddCommentNode.vue";
-import CreateNodeModal from "./CreateNodeModal.vue";
+import NodeDrawer from "./NodeDrawer.vue";
 
 import { useLayout } from "../utils/useLayout";
 import { useVueFlowStore } from "../stores/VueFlowStore";
 
-const { onNodeDragStop } = useVueFlow();
+const { onNodeClick, onNodeDragStop, onConnect, addEdges } = useVueFlow();
 const { layout } = useLayout();
+
 const vueFlowStore = useVueFlowStore();
 const { nodes, edges } = storeToRefs(vueFlowStore);
-const vueFlowRef = ref(null);
-const createNodeModal = ref();
+
+const vueFlowRef = ref();
+const nodeDrawerRef = ref();
 
 // to measure node dimensions dynamically after rendering
 async function measureNodeDimensions() {
@@ -92,52 +94,26 @@ async function measureNodeDimensions() {
   return nodeWithDimensions;
 }
 
-/* OBSERVING */
-function deleteNode(id) {
-  deleteEdges(id);
-  nodes.value = nodes.value.filter((node) => node.id !== id);
-}
-
-function deleteEdges(nodeId) {
-  edges.value = edges.value.filter(
-    (edge) => edge.source != nodeId && edge.target != nodeId
-  );
-}
-
-function addNode() {
-  const node = {
-    id: `${Math.random()}`,
-    type: "sendMessage",
-    label: "Placeholder title",
-    data: {
-      payload: [
-        {
-          type: "text",
-          text: "Placeholder text",
-        },
-      ],
-    },
-    position: { x: 0, y: 0 },
-    deletable: false,
-  };
-
-  nodes.value = [...nodes.value, node];
-}
+onNodeClick((event) => {
+  if (!["trigger", "dateTimeConnector"].includes(event.node.type)) {
+    nodeDrawerRef.value?.showDrawer(event.node);
+  }
+});
 
 onNodeDragStop((event) => {
   // update node state to set new position after dragging stops
   const nodeId = event.node.id;
-  const idx = nodes.value.findIndex((n) => n.id === nodeId);
+  const draggedNode = nodes.value.find((n) => n.id === nodeId);
 
-  if (idx > -1) {
-    nodes.value[idx].position = event.node.position;
+  if (draggedNode) {
+    draggedNode.position = event.node.position;
+    vueFlowStore.updateNode(draggedNode);
   }
 });
 
-function openCreateNodeModal() {
-  createNodeModal.value?.showModal();
-}
-/* END OBSERVING */
+onConnect((connection) => {
+  addEdges(connection);
+});
 
 onMounted(async () => {
   const nodesWithDimension = await measureNodeDimensions();
@@ -147,6 +123,6 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .vue-flow {
-  height: calc(100vh - 110px);
+  height: calc(75vh);
 }
 </style>

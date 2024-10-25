@@ -6,21 +6,38 @@
     </div>
     <div class="card-body">
       <h5 class="card-title">Message:</h5>
-      <p class="card-text">{{ text }}</p>
-      <p class="card-text" v-if="attachmentPayload?.attachment">
-        {{ attachmentPayload.attachment }}
+      <p class="card-text">{{ messageText }}</p>
+      <p class="card-text" v-if="messageAttachment">
+        {{ messageAttachment }}
       </p>
     </div>
+
+    <Handle type="target" :position="Position.Top" />
+    <Handle type="source" :position="Position.Bottom" />
   </div>
 </template>
 
 <script setup>
-const { data } = defineProps(["id", "label", "data"]);
-const textPayload = data.payload.find((p) => p.type === "text");
-const attachmentPayload = data.payload.find((p) => p.type === "attachment");
+import { computed } from "vue";
+import { Handle, Position } from "@vue-flow/core";
 
-let text = textPayload.text ?? "-";
-if (text.length > 50) text = text.slice(0, 50) + "...";
+const { data } = defineProps(["id", "label", "data"]);
+const messageText = computed(() => {
+  const textPayload = data.payload.find((p) => p.type === "text");
+  let text = textPayload?.text ?? "-";
+
+  if (text.length > 50) text = text.slice(0, 30) + "...";
+
+  return text;
+});
+const messageAttachment = computed(() => {
+  const attachmentPayload = data.payload.find((p) => p.type === "attachment");
+  let attachment = attachmentPayload?.attachment;
+
+  if (attachment?.length > 50) attachment = attachment.slice(0, 30) + "...";
+
+  return attachment;
+});
 </script>
 
 <style scoped>
