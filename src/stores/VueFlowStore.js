@@ -8,7 +8,7 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
   state: () => ({
     data: data,
     nodes: data.map((p) => {
-      return {
+      const dt = {
         id: `${p.id}`,
         type: p.type,
         label: p.name ?? "N/A",
@@ -16,6 +16,10 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
         position: { x: 0, y: 0 },
         deletable: false,
       };
+
+      if (p.parentId) dt.parentId = p.parentId;
+
+      return dt;
     }),
     edges: data.map((p) => {
       if (p.parentId) {
@@ -51,7 +55,20 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
       this.nodes = nodes;
     },
     deleteNode(id) {
-      deleteEdges(id);
+      let deleteDateTimeNode = false;
+      const deletableConnectorNodes = [];
+
+      for (const node of this.nodes) {
+        if (node.id === id && node.type === "dateTime")
+          deleteDateTimeNode = true;
+
+        if (node.parentId === id) deletableConnectorNodes.push(node);
+      }
+
+      if (deleteDateTimeNode && deletableConnectorNodes.length > 0)
+        deletableConnectorNodes.forEach((node) => this.deleteNode(node.id));
+
+      this.deleteEdges(id);
       this.nodes = this.nodes.filter((node) => node.id !== id);
     },
     deleteEdges(nodeId) {

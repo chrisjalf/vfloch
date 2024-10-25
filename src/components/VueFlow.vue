@@ -95,7 +95,6 @@ async function measureNodeDimensions() {
 }
 
 onNodeClick((event) => {
-  console.log("event", event);
   if (event.node.type !== "dateTimeConnector") {
     nodeDrawerRef.value?.showDrawer(event.node);
   }

@@ -22,6 +22,9 @@
       </div>
       <div class="offcanvas-body">
         <p>Try scrolling the rest of the page to see this option in action.</p>
+        <button type="button" class="btn btn-danger" @click="deleteNode">
+          Delete
+        </button>
       </div>
     </div>
   </teleport>
@@ -30,6 +33,10 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { Offcanvas } from "bootstrap";
+
+import { useVueFlowStore } from "../stores/VueFlowStore";
+
+const vueFlowStore = useVueFlowStore();
 
 const selectedNode = ref();
 const selectedNodeIcon = computed(() => {
@@ -60,9 +67,20 @@ function changeSelectedNode(node) {
   selectedNode.value = node;
 }
 
+function deleteNode() {
+  const nodeId = selectedNode.value.id;
+  hideDrawer();
+  vueFlowStore.deleteNode(nodeId);
+}
+
 function showDrawer(node) {
   changeSelectedNode(node);
   nodeDrawerObj.show();
+}
+
+function hideDrawer() {
+  changeSelectedNode(undefined);
+  nodeDrawerObj.hide();
 }
 
 defineExpose({ showDrawer });
