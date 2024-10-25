@@ -55,21 +55,15 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
       this.nodes = nodes;
     },
     deleteNode(id) {
-      let deleteDateTimeNode = false;
-      const deletableConnectorNodes = [];
-
-      for (const node of this.nodes) {
-        if (node.id === id && node.type === "dateTime")
-          deleteDateTimeNode = true;
-
-        if (node.parentId === id) deletableConnectorNodes.push(node);
-      }
-
-      if (deleteDateTimeNode && deletableConnectorNodes.length > 0)
-        deletableConnectorNodes.forEach((node) => this.deleteNode(node.id));
-
       this.deleteEdges(id);
       this.nodes = this.nodes.filter((node) => node.id !== id);
+    },
+    deleteDateTimeNode(id) {
+      for (const node of this.nodes) {
+        if (node.parentId === id) this.deleteNode(node.id);
+      }
+
+      this.deleteNode(id);
     },
     deleteEdges(nodeId) {
       this.edges = this.edges.filter(

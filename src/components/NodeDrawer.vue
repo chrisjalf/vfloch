@@ -68,9 +68,12 @@ function changeSelectedNode(node) {
 }
 
 function deleteNode() {
-  const nodeId = selectedNode.value.id;
+  const node = selectedNode.value;
+  const nodeId = node.id;
   hideDrawer();
-  vueFlowStore.deleteNode(nodeId);
+
+  if (node.type === "dateTime") vueFlowStore.deleteDateTimeNode(nodeId);
+  else vueFlowStore.deleteNode(nodeId);
 }
 
 function showDrawer(node) {
