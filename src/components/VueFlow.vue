@@ -54,7 +54,7 @@ import NodeDrawer from "./NodeDrawer.vue";
 import { useLayout } from "../utils/useLayout";
 import { useVueFlowStore } from "../stores/VueFlowStore";
 
-const { onNodeClick, onNodeDragStop } = useVueFlow();
+const { onNodeClick, onNodeDragStop, onConnect, addEdges } = useVueFlow();
 const { layout } = useLayout();
 
 const vueFlowStore = useVueFlowStore();
@@ -109,6 +109,10 @@ onNodeDragStop((event) => {
     draggedNode.position = event.node.position;
     vueFlowStore.updateNode(draggedNode);
   }
+});
+
+onConnect((connection) => {
+  addEdges(connection);
 });
 
 onMounted(async () => {
