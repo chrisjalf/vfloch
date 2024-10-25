@@ -45,7 +45,9 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
       const index = this.nodes.findIndex((node) => node.id === updatedNode.id);
 
       if (index > -1) {
-        this.nodes[index] = updatedNode;
+        this.nodes = this.nodes.map((node) =>
+          node.id === updatedNode.id ? { ...updatedNode } : node
+        );
         this.updateData();
       }
     },
