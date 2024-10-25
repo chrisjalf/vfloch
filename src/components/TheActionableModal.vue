@@ -49,7 +49,7 @@ import { ref, onMounted } from "vue";
 import { Modal } from "bootstrap";
 
 defineProps(["title", "body", "closeText", "confirmText"]);
-const emit = defineEmits();
+const emit = defineEmits(["confirm"]);
 
 const actionableModal = ref();
 let actionableModalObj;
