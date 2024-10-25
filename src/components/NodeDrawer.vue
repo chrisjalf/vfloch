@@ -22,17 +22,27 @@
       </div>
       <div class="offcanvas-body">
         <p>Try scrolling the rest of the page to see this option in action.</p>
-        <button type="button" class="btn btn-danger" @click="deleteNode">
+        <button type="button" class="btn btn-danger" @click="promptDeleteNode">
           Delete
         </button>
       </div>
     </div>
   </teleport>
+  <TheActionableModal
+    ref="deletionModal"
+    :title="'Deleting Node'"
+    :body="'This action cannot be undone. Proceed?'"
+    :closeText="'Close'"
+    :confirmText="'Confirm'"
+    @confirm="deleteNode"
+  />
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { Offcanvas } from "bootstrap";
+
+import TheActionableModal from "./TheActionableModal.vue";
 
 import { useVueFlowStore } from "../stores/VueFlowStore";
 
@@ -62,9 +72,14 @@ const selectedNodeIcon = computed(() => {
 });
 const nodeDrawer = ref();
 let nodeDrawerObj;
+const deletionModal = ref();
 
 function changeSelectedNode(node) {
   selectedNode.value = node;
+}
+
+function promptDeleteNode() {
+  deletionModal.value?.showModal();
 }
 
 function deleteNode() {
