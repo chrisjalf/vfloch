@@ -55,6 +55,31 @@
             v-model="nodeFields.data.comment"
           ></textarea>
         </div>
+        <div class="mb-3" v-if="nodeFields.type === 'sendMessage'">
+          <label class="form-label">Message</label>
+          <textarea class="form-control" v-model="sendMessageText"></textarea>
+        </div>
+        <div class="mb-3" v-if="nodeFields.type === 'sendMessage'">
+          <label class="form-label">Attachment</label>
+          <i
+            class="bi bi-x-circle-fill ms-2"
+            v-if="sendMessageAttachment"
+            @click="removeAttachment"
+          ></i>
+          <input
+            class="form-control mb-2"
+            :class="{ 'is-invalid': formError.attachment }"
+            type="file"
+            ref="attachmentInput"
+            @change="validateFileSize"
+          />
+          <div className="invalid-feedback" v-if="formError.attachment">
+            {{ formError.attachment }}
+          </div>
+          <div class="mt-3 text-break" v-if="sendMessageAttachment">
+            {{ sendMessageAttachment }}
+          </div>
+        </div>
       </div>
       <div class="offcanvas-footer">
         <div class="d-flex justify-content-end">
@@ -119,17 +144,72 @@ const selectedNodeIcon = computed(() => {
   return icon;
 });
 const nodeFields = ref();
+const sendMessageText = ref("");
+const attachmentInput = ref();
+const sendMessageAttachment = ref();
 const formError = ref({});
 
 function changeSelectedNode(node) {
   selectedNode.value = node;
 
   if (node) {
+    switch (node.type) {
+      case "sendMessage":
+        const textPayload = node.data.payload.find((p) => p.type === "text");
+        const attachmentPayload = node.data.payload.find(
+          (p) => p.type === "attachment"
+        );
+
+        if (textPayload) {
+          sendMessageText.value = textPayload.text;
+        }
+
+        if (attachmentPayload) {
+          sendMessageAttachment.value = attachmentPayload.attachment;
+        }
+
+        break;
+      default:
+        break;
+    }
+
     nodeFields.value = {
       ...node,
       data: { ...node.data, description: node.data?.description ?? "" },
     };
-  } else nodeFields.value = node;
+  } else {
+    switch (nodeFields.value.type) {
+      case "sendMessage":
+        sendMessageText.value = "";
+        sendMessageAttachment.value = undefined;
+
+        break;
+      default:
+        break;
+    }
+
+    nodeFields.value = node;
+  }
+}
+
+function validateFileSize(event) {
+  const file = event.target.files[0];
+  const maxSizeInMB = 2;
+  const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+  if (file && file.size > maxSizeInBytes) {
+    formError.value[
+      "attachment"
+    ] = `File size should be less than ${maxSizeInMB} MB.`;
+  } else {
+    delete formError.value["attachment"];
+    sendMessageAttachment.value = file.name;
+  }
+}
+
+function removeAttachment() {
+  attachmentInput.value.value = "";
+  sendMessageAttachment.value = undefined;
 }
 
 function validateInput(fieldName) {
@@ -171,6 +251,39 @@ function updateNode() {
   checkFields();
 
   if (Object.keys(formError.value).length === 0) {
+    console.log(nodeFields.value.type);
+    switch (nodeFields.value.type) {
+      case "sendMessage":
+        const n = nodeFields.value;
+        const payload = [];
+
+        if (sendMessageText.value) {
+          payload.push({
+            type: "text",
+            text: sendMessageText.value,
+          });
+        }
+
+        if (sendMessageAttachment.value) {
+          payload.push({
+            type: "attachment",
+            attachment: sendMessageAttachment.value,
+          });
+        }
+
+        nodeFields.value = {
+          ...n,
+          data: {
+            ...n.data,
+            payload: payload,
+          },
+        };
+
+        break;
+      default:
+        break;
+    }
+
     hideDrawer();
     vueFlowStore.updateNode(nodeFields.value);
   }
@@ -230,6 +343,10 @@ onBeforeUnmount(() => {
 
 .bi-clock-fill {
   color: orange;
+}
+
+.bi-x-circle-fill {
+  color: red;
 }
 
 .offcanvas-footer {

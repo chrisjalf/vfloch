@@ -26,14 +26,17 @@ const messageText = computed(() => {
   const textPayload = data.payload.find((p) => p.type === "text");
   let text = textPayload?.text ?? "-";
 
-  if (text.length > 50) text = text.slice(0, 50) + "...";
+  if (text.length > 50) text = text.slice(0, 30) + "...";
 
   return text;
 });
 const messageAttachment = computed(() => {
   const attachmentPayload = data.payload.find((p) => p.type === "attachment");
+  let attachment = attachmentPayload?.attachment;
 
-  return attachmentPayload?.attachment;
+  if (attachment?.length > 50) attachment = attachment.slice(0, 30) + "...";
+
+  return attachment;
 });
 </script>
 
