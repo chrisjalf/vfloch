@@ -223,7 +223,6 @@ function submitForm() {
 
   if (Object.keys(formError.value).length === 0) {
     const node = {
-      id: `${Math.random()}`,
       type: selectedNode.value.val,
       label: nodeTitle.value,
       data: {

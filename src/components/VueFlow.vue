@@ -94,21 +94,20 @@ async function measureNodeDimensions() {
   return nodeWithDimensions;
 }
 
-/* OBSERVING */
 onNodeDragStop((event) => {
   // update node state to set new position after dragging stops
   const nodeId = event.node.id;
-  const idx = nodes.value.findIndex((n) => n.id === nodeId);
+  const draggedNode = nodes.value.find((n) => n.id === nodeId);
 
-  if (idx > -1) {
-    nodes.value[idx].position = event.node.position;
+  if (draggedNode) {
+    draggedNode.position = event.node.position;
+    vueFlowStore.updateNode(draggedNode);
   }
 });
 
 function showCreateNodeModal() {
   createNodeModal.value?.showModal();
 }
-/* END OBSERVING */
 
 onMounted(async () => {
   const nodesWithDimension = await measureNodeDimensions();

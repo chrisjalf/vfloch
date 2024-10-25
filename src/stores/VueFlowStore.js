@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { v4 as uuidv4 } from "uuid";
 
 import payload from "../data/payload";
 
@@ -29,27 +30,22 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
   }),
   actions: {
     createNode(newNode) {
+      newNode.id = uuidv4();
       this.nodes.push(newNode);
 
-      const newData = {
+      this.addData({
         name: newNode.label,
         id: newNode.id,
         type: newNode.type,
         data: newNode.data,
-      };
-      this.data.push(newData);
+      });
+    },
+    updateNode(updatedNode) {
+      const index = this.nodes.findIndex((node) => node.id === updatedNode.id);
 
-      /* const nodeType = newNode.type;
-      switch (nodeType) {
-        case "sendMessage":
-          break;
-        case "dateTime":
-          break;
-        case "addComment":
-          break;
-        default:
-          break;
-      } */
+      if (index > -1) {
+        this.nodes[index] = updatedNode;
+      }
     },
     updateNodes(nodes) {
       this.nodes = nodes;
@@ -62,6 +58,9 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
       this.edges = this.edges.filter(
         (edge) => edge.source != nodeId && edge.target != nodeId
       );
+    },
+    addData(newData) {
+      this.data.push(newData);
     },
   },
 });
