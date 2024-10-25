@@ -32,6 +32,8 @@
 
     <Controls />
   </VueFlow>
+
+  <NodeDrawer ref="nodeDrawerRef" />
 </template>
 
 <script setup>
@@ -47,15 +49,19 @@ import BusinessHoursNode from "./BusinessHoursNode.vue";
 import DateTimeConnectorNode from "./DateTimeConnectorNode.vue";
 import SendMessageNode from "./SendMessageNode.vue";
 import AddCommentNode from "./AddCommentNode.vue";
+import NodeDrawer from "./NodeDrawer.vue";
 
 import { useLayout } from "../utils/useLayout";
 import { useVueFlowStore } from "../stores/VueFlowStore";
 
-const { onNodeDragStop } = useVueFlow();
+const { onNodeClick, onNodeDragStop } = useVueFlow();
 const { layout } = useLayout();
+
 const vueFlowStore = useVueFlowStore();
 const { nodes, edges } = storeToRefs(vueFlowStore);
-const vueFlowRef = ref(null);
+
+const vueFlowRef = ref();
+const nodeDrawerRef = ref();
 
 // to measure node dimensions dynamically after rendering
 async function measureNodeDimensions() {
@@ -87,6 +93,13 @@ async function measureNodeDimensions() {
 
   return nodeWithDimensions;
 }
+
+onNodeClick((event) => {
+  console.log("event", event);
+  if (event.node.type !== "dateTimeConnector") {
+    nodeDrawerRef.value?.showDrawer(event.node);
+  }
+});
 
 onNodeDragStop((event) => {
   // update node state to set new position after dragging stops
