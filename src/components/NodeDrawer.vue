@@ -48,6 +48,13 @@
             {{ formError.description }}
           </div>
         </div>
+        <div class="mb-3" v-if="nodeFields.type === 'addComment'">
+          <label class="form-label">Comment</label>
+          <textarea
+            class="form-control"
+            v-model="nodeFields.data.comment"
+          ></textarea>
+        </div>
       </div>
       <div class="offcanvas-footer">
         <div class="d-flex justify-content-end">
