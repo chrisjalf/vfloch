@@ -1,14 +1,23 @@
 <template>
-  <div class="rounded bg-primary">{{ label }}</div>
+  <div class="rounded bg-primary">
+    <div class="dt-connector-label">
+      {{ label }}
+    </div>
+
+    <Handle type="target" :position="Position.Top" :connectable="false" />
+    <Handle type="source" :position="Position.Bottom" />
+  </div>
 </template>
 
 <script setup>
+import { Handle, Position } from "@vue-flow/core";
+
 defineProps(["id", "label"]);
 </script>
 
 <style scoped>
-div {
+.dt-connector-label {
   color: #fff;
-  padding: .5rem;
+  padding: 0.5rem;
 }
 </style>

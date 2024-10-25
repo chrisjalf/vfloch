@@ -7,10 +7,15 @@
     <div class="card-body">
       <p class="card-text">{{ formatComment(data.comment ?? "-") }}</p>
     </div>
+
+    <Handle type="target" :position="Position.Top" />
+    <Handle type="source" :position="Position.Bottom" />
   </div>
 </template>
 
 <script setup>
+import { Handle, Position } from "@vue-flow/core";
+
 const { data } = defineProps(["id", "label", "data"]);
 
 function formatComment(comment) {
