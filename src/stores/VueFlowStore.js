@@ -37,9 +37,39 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
   }),
   actions: {
     createNode(newNode) {
+      if (newNode.type === "dateTime") {
+        this.createDateTimeNode(newNode);
+      } else {
+        newNode.id = uuidv4();
+
+        this.nodes.push(newNode);
+        this.updateData();
+      }
+    },
+    createDateTimeNode(newNode) {
       newNode.id = uuidv4();
+
       this.nodes.push(newNode);
-      this.updateData();
+
+      for (var i = 0; i < 2; i++) {
+        const id = uuidv4();
+        const dateTimeConnectorNode = {
+          id,
+          type: "dateTimeConnector",
+          label: i % 2 === 0 ? "Success" : "Failure",
+          data: {
+            connectorType: i % 2 === 0 ? "success" : "failure",
+          },
+          position: { x: 0, y: 0 },
+          parentId: newNode.id,
+        };
+
+        newNode.data.connectors.push(id);
+        this.nodes.push(dateTimeConnectorNode);
+      }
+
+      this.updateEdges();
+      this.updateNode(newNode);
     },
     updateNode(updatedNode) {
       const index = this.nodes.findIndex((node) => node.id === updatedNode.id);
@@ -66,6 +96,20 @@ export const useVueFlowStore = defineStore("vueFlowStore", {
       }
 
       this.deleteNode(id);
+    },
+    updateEdges() {
+      this.edges = this.nodes.reduce((acc, n) => {
+        if (n.parentId) {
+          acc.push({
+            id: `${n.id}_${n.parentId}`,
+            source: `${n.parentId}`,
+            target: `${n.id}`,
+            type: "smoothstep",
+          });
+        }
+
+        return acc;
+      }, []);
     },
     deleteEdges(nodeId) {
       this.edges = this.edges.filter(

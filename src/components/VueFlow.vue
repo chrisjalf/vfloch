@@ -95,7 +95,7 @@ async function measureNodeDimensions() {
 }
 
 onNodeClick((event) => {
-  if (event.node.type !== "dateTimeConnector") {
+  if (!["trigger", "dateTimeConnector"].includes(event.node.type)) {
     nodeDrawerRef.value?.showDrawer(event.node);
   }
 });
