@@ -32,10 +32,6 @@
 
     <Controls />
   </VueFlow>
-
-  <button @click="showCreateNodeModal">Create Node?</button>
-
-  <CreateNodeModal ref="createNodeModal" />
 </template>
 
 <script setup>
@@ -51,7 +47,6 @@ import BusinessHoursNode from "./BusinessHoursNode.vue";
 import DateTimeConnectorNode from "./DateTimeConnectorNode.vue";
 import SendMessageNode from "./SendMessageNode.vue";
 import AddCommentNode from "./AddCommentNode.vue";
-import CreateNodeModal from "./CreateNodeModal.vue";
 
 import { useLayout } from "../utils/useLayout";
 import { useVueFlowStore } from "../stores/VueFlowStore";
@@ -61,7 +56,6 @@ const { layout } = useLayout();
 const vueFlowStore = useVueFlowStore();
 const { nodes, edges } = storeToRefs(vueFlowStore);
 const vueFlowRef = ref(null);
-const createNodeModal = ref();
 
 // to measure node dimensions dynamically after rendering
 async function measureNodeDimensions() {
@@ -105,10 +99,6 @@ onNodeDragStop((event) => {
   }
 });
 
-function showCreateNodeModal() {
-  createNodeModal.value?.showModal();
-}
-
 onMounted(async () => {
   const nodesWithDimension = await measureNodeDimensions();
   vueFlowStore.updateNodes(layout(nodesWithDimension, edges.value, "TB"));
@@ -117,6 +107,6 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .vue-flow {
-  height: calc(100vh - 110px);
+  height: calc(75vh);
 }
 </style>
